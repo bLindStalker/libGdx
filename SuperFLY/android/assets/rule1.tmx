@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" nextobjectid="1">
+ <tileset firstgid="1" name="prototype" tilewidth="32" tileheight="32" spacing="4" margin="2" tilecount="5" columns="5">
+  <image source="prototype.png" width="191" height="64"/>
+ </tileset>
+ <layer name="regions" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFgwkAAAGQAAE=
+  </data>
+ </layer>
+ <layer name="input_fone" width="10" height="10" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAOMBOpbhRQBgAFyAAE
+  </data>
+ </layer>
+ <layer name="output_fone" width="10" height="10" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAOMBGpbhRQBgAEYAAD
+  </data>
+ </layer>
+</map>

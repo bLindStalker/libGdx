@@ -34,10 +34,10 @@ import static com.fly.game.SuperFly.WIDTH;
 
 public class PlayScreen extends ScreenAdapter {
 
-    public static final float MAX_HERO_MOVE_SPEED = 4.35f;
-    public static final float HERO_VELOCITY = 0.4f;
-    public static final float HERO_RELEASE = 0.14f;
-    public static final float HERO_SPEED = 6.3f;
+    public static final float MAX_HERO_MOVE_SPEED = 4.4f;
+    public static final float HERO_VELOCITY = 0.45f;
+    public static final float HERO_RELEASE = 0.12f;
+    public static final float HERO_SPEED = 6.4f;
 
     private SuperFly game;
     private OrthographicCamera camera;
@@ -86,7 +86,7 @@ public class PlayScreen extends ScreenAdapter {
         PolygonShape shape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
 
-        for (MapObject object : tiled.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : tiled.getLayers().get("wall").getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
             shape.setAsBox(rect.getWidth() / 2 / PPM, rect.getHeight() / 2 / PPM);
@@ -102,7 +102,7 @@ public class PlayScreen extends ScreenAdapter {
     }
 
     private void createCoins(TiledMap tiled) {
-        for (MapObject object : tiled.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : tiled.getLayers().get("coins").getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
             coins.add(new Coin(world, rect));
         }
@@ -122,7 +122,7 @@ public class PlayScreen extends ScreenAdapter {
 
         mapRenderer.setView(camera);
 
-        world.step(delta, 6, 2);
+        world.step(delta, 4, 4);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(camera.combined);
