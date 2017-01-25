@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.fly.game.SuperFly;
+import com.fly.game.TextureMapObjectRenderer;
 import com.fly.game.WorldContactListener;
 import com.fly.game.screen.object.Coin;
 
@@ -34,10 +35,10 @@ import static com.fly.game.SuperFly.WIDTH;
 
 public class PlayScreen extends ScreenAdapter {
 
-    public static final float MAX_HERO_MOVE_SPEED = 4.4f;
-    public static final float HERO_VELOCITY = 0.45f;
-    public static final float HERO_RELEASE = 0.12f;
-    public static final float HERO_SPEED = 6.4f;
+    public static final float MAX_HERO_MOVE_SPEED = 440 / PPM;
+    public static final float HERO_VELOCITY = 45 / PPM;
+    public static final float HERO_RELEASE = 12 / PPM;
+    public static final float HERO_SPEED = 630f / PPM;
 
     private SuperFly game;
     private OrthographicCamera camera;
@@ -59,7 +60,7 @@ public class PlayScreen extends ScreenAdapter {
         this.game = game;
 
         camera = new OrthographicCamera();
-        viewport = new FitViewport(WIDTH / PPM, HEIGHT / PPM, camera);
+        viewport = new FitViewport(WIDTH / PPM , HEIGHT / PPM , camera);
         camera.position.set(viewport.getWorldWidth() / 2, 0, 0);
 
         bg = new Texture("bg.png");
@@ -76,7 +77,7 @@ public class PlayScreen extends ScreenAdapter {
     private void loadLevel() {
         TmxMapLoader mapLoader = new TmxMapLoader();
         map = mapLoader.load("firstLevel.tmx");
-        mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / PPM);
+        mapRenderer = new TextureMapObjectRenderer(map, 1 / PPM);
         createB2Object(map);
     }
 
@@ -110,6 +111,7 @@ public class PlayScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        System.out.println("FPS: " + (1 / delta));
         hero.update();
         if (!hero.isDead) {
             handleInput(delta);
