@@ -59,7 +59,7 @@ public class Hero extends Sprite {
 
     private void defineHero() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set(WIDTH / PPM + 35 / PPM, 250 / PPM);
+        bdef.position.set(WIDTH / PPM + 35 / PPM, 290 / PPM);
         bdef.type = BodyDef.BodyType.DynamicBody;
         b2body = word.createBody(bdef);
 

@@ -196,7 +196,7 @@ public class PlayScreen extends ScreenAdapter {
         game.batch.end();
         mapRenderer.render();
 
-        b2dr.render(world, camera.combined);
+        //b2dr.render(world, camera.combined);
 
         if (hero.isDead && hero.b2body.getPosition().y < camera.position.y / 2) {
             world.destroyBody(hero.b2body);
