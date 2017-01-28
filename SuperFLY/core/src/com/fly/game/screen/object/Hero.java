@@ -1,4 +1,4 @@
-package com.fly.game.screen;
+package com.fly.game.screen.object;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -21,17 +21,36 @@ public class Hero extends Sprite {
     public boolean isDead = false;
     public boolean left;
     public boolean right;
+    public boolean dodj = false;
+    public boolean dodjed = false;
+    public boolean needChange = true;
 
+    public Texture normalHeroTexture;
+    public Texture dodjHeroTexture;
 
     public Hero(World world) {
         super(new Texture("hero.png"));
+        normalHeroTexture = new Texture("hero.png");
+        dodjHeroTexture = new Texture("heroDodj.png");
         this.word = world;
         setBounds(0, 0, getWidth() / PPM, getHeight() / PPM);
         defineHero();
     }
 
     public void update() {
-        setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - getHeight() / 2);
+        if (dodjed) {
+            if (needChange) {
+                setTexture(dodjHeroTexture);
+            }
+            needChange = false;
+        } else {
+            if (!needChange) {
+                setTexture(normalHeroTexture);
+            }
+            needChange = true;
+        }
+
+        setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - getHeight() / 2 - 40 / PPM);
 
         if (isDead) {
             b2body.applyLinearImpulse(new Vector2(0, -0.3f), b2body.getWorldCenter(), true);
@@ -46,7 +65,7 @@ public class Hero extends Sprite {
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(getWidth() / 2, getHeight() / 2);
+        shape.setAsBox(getWidth() / 2, getHeight() / 2 - 40 / PPM);
 
         fdef.shape = shape;
         b2body.createFixture(fdef).setUserData(this);

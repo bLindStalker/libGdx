@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -24,6 +25,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.fly.game.SuperFly;
 import com.fly.game.TextureMapObjectRenderer;
 import com.fly.game.WorldContactListener;
+import com.fly.game.screen.object.Cloud;
 import com.fly.game.screen.object.Coin;
 
 import java.util.ArrayList;
@@ -51,16 +53,17 @@ public class PlayScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMap map;
 
-    private Hero hero;
+    private com.fly.game.screen.object.Hero hero;
 
     private boolean play = false;
     private List<Coin> coins = new ArrayList<Coin>();
+    private List<Cloud> clouds = new ArrayList<Cloud>();
 
     public PlayScreen(SuperFly game) {
         this.game = game;
 
         camera = new OrthographicCamera();
-        viewport = new FitViewport(WIDTH / PPM , HEIGHT / PPM , camera);
+        viewport = new FitViewport(WIDTH / PPM, HEIGHT / PPM, camera);
         camera.position.set(viewport.getWorldWidth() / 2, 0, 0);
 
         bg = new Texture("bg.png");
@@ -69,9 +72,9 @@ public class PlayScreen extends ScreenAdapter {
         b2dr = new Box2DDebugRenderer();
 
         loadLevel();
-        hero = new Hero(world);
+        hero = new com.fly.game.screen.object.Hero(world);
         world.setContactListener(new WorldContactListener());
-        Gdx.input.setInputProcessor(new MyGestureListener(hero, camera));
+        Gdx.input.setInputProcessor(new com.fly.game.MyGestureListener(hero, camera));
     }
 
     private void loadLevel() {
@@ -92,6 +95,7 @@ public class PlayScreen extends ScreenAdapter {
 
             shape.setAsBox(rect.getWidth() / 2 / PPM, rect.getHeight() / 2 / PPM);
             fixtureDef.shape = shape;
+            fixtureDef.friction = 0;
 
             bodyDef.type = BodyDef.BodyType.StaticBody;
             bodyDef.position.set((rect.getX() + rect.getWidth() / 2) / PPM, (rect.getY() + rect.getHeight() / 2) / PPM);
@@ -99,7 +103,42 @@ public class PlayScreen extends ScreenAdapter {
             body.createFixture(fixtureDef);
         }
 
+        for (MapObject object : tiled.getLayers().get("dodj").getObjects().getByType(RectangleMapObject.class)) {
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+
+            shape.setAsBox(rect.getWidth() / 2 / PPM, rect.getHeight() / 2 / PPM);
+            fixtureDef.shape = shape;
+            fixtureDef.friction = 0;
+
+            bodyDef.type = BodyDef.BodyType.StaticBody;
+            bodyDef.position.set((rect.getX() + rect.getWidth() / 2) / PPM, (rect.getY() + rect.getHeight() / 2) / PPM);
+            Body body = world.createBody(bodyDef);
+            body.createFixture(fixtureDef).setUserData("dodj");
+        }
+
+       /* for (MapObject object : tiled.getLayers().get("line").getObjects().getByType(PolylineMapObject.class)) {
+            Polyline polyline = ((PolylineMapObject) object).getPolyline();
+            ChainShape chainShape = new ChainShape();
+            float[] vertices = new float[polyline.getVertices().length];
+            for (int i = 0; i < polyline.getVertices().length; i++) {
+                vertices[i] = polyline.getVertices()[i] / PPM;
+            }
+            chainShape.createChain(vertices);
+
+            FixtureDef fixtureDef2 = new FixtureDef();
+            fixtureDef2.shape = chainShape;
+
+            BodyDef bodyDef2 = new BodyDef();
+            bodyDef2.active = false;
+            bodyDef2.type = BodyDef.BodyType.StaticBody;
+            bodyDef2.position.set(polyline.getX() / PPM, polyline.getY() / PPM);
+
+            Body body = world.createBody(bodyDef2);
+            body.createFixture(fixtureDef2);
+        }*/
+
         createCoins(tiled);
+        createCloud(tiled);
     }
 
     private void createCoins(TiledMap tiled) {
@@ -109,9 +148,17 @@ public class PlayScreen extends ScreenAdapter {
         }
     }
 
+
+    private void createCloud(TiledMap tiled) {
+        for (MapObject object : tiled.getLayers().get("storm").getObjects().getByType(RectangleMapObject.class)) {
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            clouds.add(new Cloud(world, rect));
+        }
+    }
+
     @Override
     public void render(float delta) {
-        System.out.println("FPS: " + (1 / delta));
+        // System.out.println("FPS: " + (1 / delta));
         hero.update();
         if (!hero.isDead) {
             handleInput(delta);
@@ -142,6 +189,10 @@ public class PlayScreen extends ScreenAdapter {
             coin.update(game.batch);
         }
 
+        for (Cloud cloud : clouds) {
+            cloud.update(game.batch);
+        }
+
         game.batch.end();
         mapRenderer.render();
 
@@ -149,8 +200,8 @@ public class PlayScreen extends ScreenAdapter {
 
         if (hero.isDead && hero.b2body.getPosition().y < camera.position.y / 2) {
             world.destroyBody(hero.b2body);
-            hero = new Hero(world);
-            Gdx.input.setInputProcessor(new MyGestureListener(hero, camera));
+            hero = new com.fly.game.screen.object.Hero(world);
+            Gdx.input.setInputProcessor(new com.fly.game.MyGestureListener(hero, camera));
             for (Coin coin : coins) {
                 coin.collect();
             }
@@ -162,6 +213,10 @@ public class PlayScreen extends ScreenAdapter {
         if (Gdx.input.justTouched() && !play) {
             play = true;
             hero.run();
+
+            for (Cloud cloud : clouds) {
+                cloud.b2body.setLinearVelocity(new Vector2(MathUtils.random(-0.5f, 0.5f), MathUtils.random(-0.5f, 0.5f)));
+            }
         }
 
         right(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || hero.right);

@@ -1,14 +1,14 @@
-package com.fly.game.screen;
+package com.fly.game;
 
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 
 public class MyGestureListener extends InputAdapter {
-    private Hero hero;
+    private com.fly.game.screen.object.Hero hero;
     private OrthographicCamera camera;
 
-    public MyGestureListener(Hero hero, OrthographicCamera camera) {
+    public MyGestureListener(com.fly.game.screen.object.Hero hero, OrthographicCamera camera) {
         this.hero = hero;
         this.camera = camera;
     }
@@ -25,6 +25,13 @@ public class MyGestureListener extends InputAdapter {
             hero.right = true;
         }
         return super.touchDown(screenX, screenY, pointer, button);
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        hero.dodjed = hero.dodj;
+        System.out.println("drugged");
+        return super.touchDragged(screenX, screenY, pointer);
     }
 
     @Override
